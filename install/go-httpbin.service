@@ -1,0 +1,27 @@
+# Install
+# Make sure all paths are correct.
+# - sudo cp install/go-httpbin.service /usr/lib/systemd/system/go-httpbin.service
+# - sudo chmod 664 /usr/lib/systemd/system/go-httpbin.service
+# - sudo systemctl daemon-reload
+# - sudo systemctl start go-httpbin.service
+# - sudo systemctl status go-httpbin.service
+
+[Unit]
+Description=go-httpbin - rest service.
+After=syslog.target network.target
+
+[Service]
+PIDFile=/var/run/go-httpbin.pid
+User=ubuntu
+Group=ubuntu
+ExecStartPre=/bin/mkdir -p /home/ubuntu/go/src/go-httpbin/log
+ExecStartPre=/bin/touch /home/ubuntu/go/src/go-httpbin/log/access.log
+WorkingDirectory=/home/ubuntu/go/src/go-httpbin
+ExecStart=/bin/sh -c "/home/ubuntu/go/src/go-httpbin/dist/go-httpbin >> /home/ubuntu/go/src/go-httpbin/log/access.log 2>&1"
+ExecStop=/bin/kill -s QUIT $MAINPID
+ExecReload=/bin/kill -s USR2 $MAINPID
+Restart=always
+RestartSec=1
+
+[Install]
+WantedBy=multi-user.target
